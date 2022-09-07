@@ -31,4 +31,8 @@ contract Lock {
 
         owner.transfer(address(this).balance);
     }
+
+    function check() public pure returns (string memory) {
+        return "Hello, World!";
+    }
 }
