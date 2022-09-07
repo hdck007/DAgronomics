@@ -1,0 +1,14 @@
+{
+  "name": "dagronomics",
+  "version": "1.0.0",
+  "description": "A blockchain based agricultural product distribution dapp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^1.0.1"
+  }
+}

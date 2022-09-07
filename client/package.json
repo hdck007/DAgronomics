@@ -1,0 +1,23 @@
+{
+  "name": "next-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "ethers": "^5.7.0",
+    "next": "^12.1.0",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "wagmi": "^0.6.4"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.8",
+    "daisyui": "^2.25.0",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8"
+  }
+}
