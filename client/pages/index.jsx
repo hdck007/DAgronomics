@@ -37,7 +37,9 @@ function Profile() {
 		useConnect();
 
 	return (
-		<div>
+		<div className='prose'>
+			<h1>sadjkfbhsdhkf</h1>
+			<h2>sadjkfbhsdhkf</h2>
 			{connectors.map((connector) => (
 				<button
 					type='button'

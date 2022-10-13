@@ -17,5 +17,7 @@ module.exports = {
 		'react/react-in-jsx-scope': 'off',
 		'react/forbid-prop-types': 'off',
 		'react/jsx-props-no-spreading': 'off',
+		'import/no-extraneous-dependencies': 'off',
+		'global-require': 'off',
 	},
 };
