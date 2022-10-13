@@ -1,36 +1,5 @@
-import { useConnect, useAccount, useBalance } from 'wagmi';
-import PropTypes from 'prop-types';
-
-function Balance({ addressOrName }) {
-	const { data, isError, isLoading } = useBalance({
-		addressOrName,
-	});
-
-	if (isLoading) return <div>Fetching balance…</div>;
-	if (isError) return <div>Error fetching balance</div>;
-	return (
-		<div>
-			Balance: {data?.formatted} {data?.symbol}
-		</div>
-	);
-}
-
-Balance.propTypes = {
-	addressOrName: PropTypes.string.isRequired,
-};
-
-function Account() {
-	const { address, isConnecting, isDisconnected } = useAccount();
-
-	if (isConnecting) return <div>Connecting…</div>;
-	if (isDisconnected) return <div>Disconnected</div>;
-	return (
-		<div>
-			{address}
-			<Balance addressOrName={address} />
-		</div>
-	);
-}
+import { useConnect } from 'wagmi';
+import Account from '../src/components/account';
 
 function Profile() {
 	const { connect, connectors, error, isLoading, pendingConnector } =
@@ -38,8 +7,6 @@ function Profile() {
 
 	return (
 		<div className='prose'>
-			<h1>sadjkfbhsdhkf</h1>
-			<h2>sadjkfbhsdhkf</h2>
 			{connectors.map((connector) => (
 				<button
 					type='button'
