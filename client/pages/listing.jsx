@@ -3,9 +3,10 @@ import Image from 'next/image';
 // generate dummy crops data
 const crops = new Array(20).fill(0).map((_, i) => ({
 	id: i,
-	name: `Crop ${i}`,
+	name: `Carrot ${i}`,
 	description: `This is a description for crop ${i}`,
 	image: `https://picsum.photos/seed/${i}/200/200`,
+	location: "Mumbai",
 }));
 
 function Listing() {
@@ -20,6 +21,13 @@ function Listing() {
 					>
 						<Image src={crop.image} alt={crop.name} width={200} height={200} />
 						<h2 className='card-title'>{crop.name}</h2>
+						<div className='flex flex-grow'>
+
+						<span className='border border-primary py-1 px-4 rounded-full m-2'>
+							<span className='text-secondary'>Location:</span>{' '}
+							{crop.location}
+						</span>
+						</div>
 						<p>{crop.description}</p>
 						<button type='button' className='btn btn-primary'>
 							View
