@@ -1,30 +1,57 @@
-import { useConnect } from 'wagmi';
-import Account from '../src/components/account';
+import { useConnect, useAccount } from 'wagmi';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router'
+import Layout from '../src/components/layout';
 
 function Profile() {
 	const { connect, connectors, error, isLoading, pendingConnector } =
 		useConnect();
+		const { isConnected, address } = useAccount();
+
+		const router = useRouter()
+
+		useEffect(() => {
+			if(isConnected){
+				fetch(`/api/login?address=${address}`).then(res =>res.json())
+				.then(data => {
+					if(data.authenticated && data.role){
+						router.push('/listing')
+					}
+					else router.push('/signup')
+				})
+			}
+		}, [isConnected])
 
 	return (
-		<div className='prose'>
-			{connectors.map((connector) => (
-				<button
-					type='button'
-					className='btn btn-primary'
-					key={connector.id}
-					onClick={() => connect({ connector })}
-				>
-					{connector.name}
-					{!connector.ready && ' (unsupported)'}
-					{isLoading &&
-						connector.id === pendingConnector?.id &&
-						' (connecting)'}
-				</button>
-			))}
-
-			{error && <div>{error.message}</div>}
-			<Account />
-		</div>
+		<Layout>
+			<div className='prose mx-auto h-[80vh] flex justify-center items-center'>
+				<div className='w-2/3 mx-auto p-10 rounded-md shadow-sm bg-neutral'>
+					<h3 className='my-4 px-2'>Click to login</h3>
+					{connectors.map((connector) => (
+						<button
+							type='button'
+							className='btn btn-primary w-full'
+							key={connector.id}
+							onClick={() => connect({ connector })}
+						>
+							Login
+							{!connector.ready && ' (unsupported)'}
+							{isLoading &&
+								connector.id === pendingConnector?.id &&
+								' (connecting)'}
+						</button>
+					))}
+					{error && <div className='text-sm px-2 text-error' >{error.message}</div>}
+					<button
+							type='button'
+							className='btn btn-primary w-full mt-4'
+							onClick={() => router.push('/signup')}
+						>
+						Signup
+						</button>
+				</div>
+			</div>
+		</Layout>
 	);
 }
 

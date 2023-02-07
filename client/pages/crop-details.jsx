@@ -1,3 +1,5 @@
+import Layout from '../src/components/layout';
+
 const cropDetail = {
 	id: 1,
 	name: 'Crop 1',
@@ -16,36 +18,43 @@ const cropDetail = {
 
 function CropDetails() {
 	return (
-		<div className='prose prose-h1:text-4xl w-full py-12 max-w-6xl mx-auto'>
-			<h1 className='text-center mb-16'>{cropDetail.name}</h1>
-			<div className='mx-auto w-full'>
-				<div className='w-full bg-red-400'>
-					<img
-						className='w-full h-[500px]'
-						src={cropDetail.image[0]}
-						alt={cropDetail.name}
-					/>
-				</div>
-				<div className=' w-full px-4 lg:px-0'>
-					<h3 className='text-primary-content my-0'>
-						{cropDetail.description}
-					</h3>
-					<div className='flex items-center justify-between text-xl mt-6 flex-wrap'>
-						<span className='border border-primary py-1 px-4 rounded-full m-2'>
-							<span className='text-secondary'>Price:</span> {cropDetail.price}
-						</span>
-						<span className='border border-primary py-1 px-4 rounded-full m-2'>
-							<span className='text-secondary'>Quantity:</span>{' '}
-							{cropDetail.quantity}
-						</span>
-						<span className='border border-primary py-1 px-4 rounded-full m-2'>
-							<span className='text-secondary'>Location:</span>{' '}
-							{cropDetail.location}
-						</span>
+		<Layout>
+			<div className='prose prose-h1:text-4xl w-full max-w-6xl mx-auto'>
+				<div className='flex flex-col md:flex-row w-full p-4 bg-neutral '>
+					<div className=' w-full md:w-1/2 md:p-10'>
+						<img
+							className='w-full h-[500px]'
+							src={cropDetail.image[0]}
+							alt={cropDetail.name}
+						/>
+					</div>
+					<div className='w-full md:w-1/2 md:p-10 md:border-l border-stone-700 '>
+						<h1 className='text-center mb-16'>{cropDetail.name}</h1>
+						<div className='mx-auto w-full'>
+							<div className=' w-full px-4 lg:px-0'>
+								<h3 className='text-primary-content my-0'>
+									{cropDetail.description}
+								</h3>
+								<div className='flex items-center justify-between text-xl mt-6 flex-wrap'>
+									<span className='border border-primary py-1 px-4 rounded-full m-2'>
+										<span className='text-secondary'>Price:</span>{' '}
+										{cropDetail.price}
+									</span>
+									<span className='border border-primary py-1 px-4 rounded-full m-2'>
+										<span className='text-secondary'>Quantity:</span>{' '}
+										{cropDetail.quantity}
+									</span>
+									<span className='border border-primary py-1 px-4 rounded-full m-2'>
+										<span className='text-secondary'>Location:</span>{' '}
+										{cropDetail.location}
+									</span>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</Layout>
 	);
 }
 
