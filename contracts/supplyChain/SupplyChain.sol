@@ -306,16 +306,9 @@ Allows distributor to purchase cheese
 */
     function purchaseItemByDistributor(uint256 _productCode)
         public
-        payable
-        onlyDistributor // check _msgSender() belongs to distributorRole
-        forSaleByFarmer(_productCode) // check items state is for ForSaleByFarmer
-        paidEnough(items[_productCode].productPrice) // check if distributor sent enough Ether for cheese
-        checkValue(_productCode, payable(_msgSender())) // check if overpayed return remaing funds back to _msgSender()
+        onlyDistributor
+        forSaleByFarmer(_productCode) 
     {
-        address payable ownerAddressPayable = _make_payable(
-            items[_productCode].originFarmerID
-        ); // make originFarmID payable
-        ownerAddressPayable.transfer(items[_productCode].productPrice); // transfer funds from distributor to farmer
         items[_productCode].ownerID = _msgSender(); // update owner
         items[_productCode].distributorID = _msgSender(); // update distributor
         items[_productCode].itemState = State.PurchasedByDistributor; // update state
@@ -353,17 +346,16 @@ Allows distributor to purchase cheese
     }
 
     /*
-  6th step in supplychain
-  Allows distributor to process cheese
-  */
-    function processedItemByDistributor(uint256 _productCode, uint256 slices)
+//   6th step in supplychain
+//   Allows distributor to process cheese
+//   */
+    function processedItemByDistributor(uint256 _productCode)
         public
         onlyDistributor // check _msgSender() belongs to DistributorRole
         receivedByDistributor(_productCode)
         verifyCaller(items[_productCode].ownerID) // check _msgSender() is owner
     {
         items[_productCode].itemState = State.ProcessedByDistributor; // update state
-        items[_productCode].productSliced = slices; // add slice amount
         emit ProcessedByDistributor(_productCode);
     }
 
@@ -388,7 +380,6 @@ Allows distributor to purchase cheese
     function sellItemByDistributor(uint256 _productCode, uint256 _price)
         public
         onlyDistributor // check _msgSender() belongs to DistributorRole
-        packagedByDistributor(_productCode)
         verifyCaller(items[_productCode].ownerID) // check _msgSender() is owner
     {
         items[_productCode].itemState = State.ForSaleByDistributor;
@@ -405,13 +396,9 @@ Allows distributor to purchase cheese
         payable
         onlyRetailer // check _msgSender() belongs to RetailerRole
         forSaleByDistributor(_productCode)
-        paidEnough(items[_productCode].productPrice)
-        checkValue(_productCode, payable(_msgSender()))
+        // paidEnough(items[_productCode].productPrice)
+        // checkValue(_productCode, payable(_msgSender()))
     {
-        address payable ownerAddressPayable = _make_payable(
-            items[_productCode].distributorID
-        );
-        ownerAddressPayable.transfer(items[_productCode].productPrice);
         items[_productCode].ownerID = _msgSender();
         items[_productCode].retailerID = _msgSender();
         items[_productCode].itemState = State.PurchasedByRetailer;

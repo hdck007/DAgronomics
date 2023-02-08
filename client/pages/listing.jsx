@@ -11,12 +11,12 @@ function Listing() {
 	const { refetch } = useContractRead({
 		addressOrName: contractaddress,
 		contractInterface: abi,
-		functionName: 'getProducts'
+		functionName: 'getProducts',
 	});
 
 	useEffect(() => {
 		refetch().then((data) => {
-			if(data.isError){
+			if (data.isError) {
 				Swal.fire({
 					icon: 'error',
 					title: 'Oops...',
@@ -28,10 +28,10 @@ function Listing() {
 				id: item.productIndex._hex,
 				name: item.name,
 				description: item.description,
-				image: `https://picsum.photos/seed/${item.originFarmName}/200/200`,
+				image: `https://cdn.britannica.com/89/140889-050-EC3F00BF/Ripening-heads-rice-Oryza-sativa.jpg`,
 				location: item.originFarmInformation,
 			}));
-			if(cropArray){
+			if (cropArray) {
 				setCrops(cropArray);
 			}
 		});

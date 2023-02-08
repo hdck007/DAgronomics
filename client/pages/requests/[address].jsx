@@ -3,20 +3,102 @@ import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { usePrepareContractWrite, useContractWrite } from 'wagmi';
 import Layout from '../../src/components/layout';
-import { abi } from '../../src/constants';
+import { abi, contractaddress } from '../../src/constants';
 
 export default function Requests({ requestArray }) {
+	const { isLoading: farmerLoading, write: writeAsFarmer } = useContractWrite({
+		mode: 'recklesslyUnprepared',
+		args: new Array(1).fill(''),
+		addressOrName: contractaddress,
+		contractInterface: abi,
+		functionName: 'addFarmer',
+		onSuccess: (data) => {
+			Swal.fire({
+				title: 'Success',
+				text: 'Farmer add request sent',
+				icon: 'success',
+				confirmButtonText: 'Ok',
+			});
+		},
+		onError: (err) => {
+			Swal.fire({
+				title: 'Error',
+				text: 'Farmer add request failed',
+				icon: 'error',
+				confirmButtonText: 'Ok',
+			});
+		},
+	});
 
-	const farmerConfig = usePrepareContractWrite({
-    addressOrName: '0xecb504d39723b0be0e3a9aa33d646642d1051ee1',
-    contractInterface: abi,
-    functionName: 'addFarmer',
-  })
-  const { writeAsync: writeAsFarmer } = useContractWrite(farmerConfig)
-  const [requests, setRequests] = useState(requestArray);
+	const { isLoading: distributorLoading, write: writeAsDistributor } =
+		useContractWrite({
+			mode: 'recklesslyUnprepared',
+			args: new Array(1).fill(''),
+			addressOrName: contractaddress,
+			contractInterface: abi,
+			functionName: 'addDistributor',
+			onSettled: (data, error) => {
+				if (error) {
+					Swal.fire({
+						title: 'Error',
+						text: 'Distributor add request failed',
+						icon: 'error',
+						confirmButtonText: 'Ok',
+					});
+				} else {
+					Swal.fire({
+						title: 'Success',
+						text: 'Distributor add request sent',
+						icon: 'success',
+						confirmButtonText: 'Ok',
+					});
+					console.log(data);
+				}
+			},
+		});
+
+	const { isLoading: retailerLoading, write: writeAsRetailer } =
+		useContractWrite({
+			mode: 'recklesslyUnprepared',
+			args: new Array(1).fill(''),
+			addressOrName: contractaddress,
+			contractInterface: abi,
+			functionName: 'addRetailer',
+			onSuccess: (data) => {
+				Swal.fire({
+					title: 'Success',
+					text: 'Retailer add request sent',
+					icon: 'success',
+					confirmButtonText: 'Ok',
+				});
+			},
+			onError: (err) => {
+				Swal.fire({
+					title: 'Error',
+					text: 'Retailer add request failed',
+					icon: 'error',
+					confirmButtonText: 'Ok',
+				});
+			},
+		});
+	const [requests, setRequests] = useState(requestArray);
 
 	const handleRoleAdd = (address, role) => async (e) => {
 		e.preventDefault();
+		console.log(address, role);
+		if (role === 'farmer') {
+			await writeAsFarmer({
+				recklesslySetUnpreparedArgs: [address],
+			});
+		} else if (role === 'distributor') {
+			await writeAsDistributor({
+				recklesslySetUnpreparedArgs: [address],
+			});
+		} else if (role === 'retailer') {
+			writeAsRetailer({
+				recklesslySetUnpreparedArgs: [address],
+			});
+		}
 		const res = await fetch(`/api/login?address=${address}&role=${role}`);
 		const data = await res.json();
 		if (!data.err) {
@@ -25,14 +107,14 @@ export default function Requests({ requestArray }) {
 				title: 'Success',
 				text: 'Role added successfully!',
 			});
-      setRequests(requests.filter((item) => item.address !== address));
-		}else{
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong!',
-      });
-    }
+			setRequests(requests.filter((item) => item.address !== address));
+		} else {
+			Swal.fire({
+				icon: 'error',
+				title: 'Oops...',
+				text: 'Something went wrong!',
+			});
+		}
 	};
 
 	return (
@@ -58,6 +140,9 @@ export default function Requests({ requestArray }) {
 								onClick={handleRoleAdd(item.address, item.role)}
 								className='btn btn-primary'
 								type='button'
+								disabled={
+									farmerLoading || distributorLoading || retailerLoading
+								}
 							>
 								Add role
 							</button>
@@ -73,26 +158,13 @@ export default function Requests({ requestArray }) {
 
 export async function getServerSideProps(context) {
 	const { address } = context.params;
-	const result = await fetch(
-		`http://localhost:3000/api/login?address=${address}`
-	);
-	const authenticated = await result.json();
-
-	if (authenticated.role === 'super') {
-		const prisma = new PrismaClient();
-		const requestArray = await prisma.requests.findMany({
-			where: {},
-		});
-		return {
-			props: {
-				requestArray,
-			},
-		};
-	}
+	const prisma = new PrismaClient();
+	const requestArray = await prisma.requests.findMany({
+		where: {},
+	});
 	return {
-		redirect: {
-			destination: '/',
-			permanent: false,
+		props: {
+			requestArray,
 		},
 	};
 }

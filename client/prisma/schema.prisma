@@ -21,3 +21,11 @@ model Users{
   role String
   address String
 }
+
+model Bidrequests{
+  id Int @id @default(autoincrement())
+  productId Int
+  user String
+  type String
+  amount Int?
+}

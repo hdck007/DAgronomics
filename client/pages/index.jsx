@@ -1,26 +1,25 @@
 import { useConnect, useAccount } from 'wagmi';
 import { useEffect } from 'react';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 import Layout from '../src/components/layout';
+import useAuth from '../src/contexts/auth-context';
 
 function Profile() {
 	const { connect, connectors, error, isLoading, pendingConnector } =
 		useConnect();
-		const { isConnected, address } = useAccount();
+	const { isConnected, address } = useAccount();
+	const { role } = useAuth();
+	const router = useRouter();
 
-		const router = useRouter()
-
-		useEffect(() => {
-			if(isConnected){
-				fetch(`/api/login?address=${address}`).then(res =>res.json())
-				.then(data => {
-					if(data.authenticated && data.role){
-						router.push('/listing')
-					}
-					else router.push('/signup')
-				})
+	useEffect(() => {
+		if (isConnected) {
+			if (!role) {
+				router.push('/signup');
+			} else {
+				router.push('/listing');
 			}
-		}, [isConnected])
+		}
+	}, [isConnected, role]);
 
 	return (
 		<Layout>
@@ -41,14 +40,16 @@ function Profile() {
 								' (connecting)'}
 						</button>
 					))}
-					{error && <div className='text-sm px-2 text-error' >{error.message}</div>}
+					{error && (
+						<div className='text-sm px-2 text-error'>{error.message}</div>
+					)}
 					<button
-							type='button'
-							className='btn btn-primary w-full mt-4'
-							onClick={() => router.push('/signup')}
-						>
+						type='button'
+						className='btn btn-primary w-full mt-4'
+						onClick={() => router.push('/signup')}
+					>
 						Signup
-						</button>
+					</button>
 				</div>
 			</div>
 		</Layout>

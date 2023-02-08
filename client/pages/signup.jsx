@@ -58,7 +58,7 @@ function Profile() {
 						className='select select-primary w-full max-w-xs'
 					>
 						<option value='farmer'>Farmer</option>
-						<option value='ditributor'>Distributor</option>
+						<option value='distributor'>Distributor</option>
 						<option value='retailer'>Retailer</option>
 					</select>
 					<button

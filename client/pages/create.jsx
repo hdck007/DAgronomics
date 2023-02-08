@@ -4,6 +4,7 @@ import Layout from '../src/components/layout';
 import InputField from '../src/components/input-component';
 import { abi, contractaddress } from '../src/constants';
 import useAuth from '../src/hooks/useAuth';
+import Swal from 'sweetalert2';
 
 function Create() {
 	const {
@@ -19,6 +20,22 @@ function Create() {
 		addressOrName: contractaddress,
 		contractInterface: abi,
 		functionName: 'produceItemByFarmer',
+		onSuccess: (data) => {
+			Swal.fire({
+				title: 'Success',
+				text: 'Product add request sent',
+				icon: 'success',
+				confirmButtonText: 'Ok',
+			});
+		},
+		onError: (err) => {
+			Swal.fire({
+				title: 'Error',
+				text: 'Product add request failed',
+				icon: 'error',
+				confirmButtonText: 'Ok',
+			});
+		},
 	});
 
 	const onSubmit = (data) => {
