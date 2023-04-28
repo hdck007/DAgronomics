@@ -11,11 +11,15 @@ export default function Navbar() {
 
 	useEffect(() => {
 		if (isConnected) {
-			if (role === 'super') {
-				setShowRequest(true);
+			if (role) {
+				if (role === 'super') {
+					setShowRequest(true);
+				} else {
+					setShowRequest(false);
+				}
 			}
 		}
-	}, [role, isConnected]);
+	}, [role, isConnected, address]);
 
 	const handleDashboarRoute = () => {
 		if (isConnected && role) {
@@ -37,21 +41,26 @@ export default function Navbar() {
 				onClick={() => router.push('/listing')}
 				className='p-6 text-2xl font-extrabold cursor-pointer'
 			>
-				Dagronomics
+				dagronomics
 			</span>
 			{showRequest && (
 				<span
 					onClick={() => router.push(`/requests/${address}`)}
-					className='p-6 text-2xl font-extrabold ml-auto justify-end cursor-pointer'
+					className='p-6 text-2xl hover:underline transition-all duration-300 font-extrabold ml-auto justify-end cursor-pointer'
 				>
 					requests
 				</span>
 			)}
 			<span
-				className='justify-end px-4 text-primary self-center cursor-pointer'
+				className='justify-end px-4 hover:underline transition-all text-ellipsis
+				 duration-300 text-primary self-center cursor-pointer'
 				onClick={handleDashboarRoute}
 			>
-				{isConnected && address}
+				<span className='overflow-ellipsis overflow-hidden'>
+					{isConnected && [...address].splice(0, 6).join('') + '...'}
+				</span>
+				<br />
+				<span className='capitalize'>{role}</span>
 			</span>
 		</nav>
 	);

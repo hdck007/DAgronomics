@@ -12,6 +12,9 @@ export default function Requests({ requestArray }) {
 		addressOrName: contractaddress,
 		contractInterface: abi,
 		functionName: 'addFarmer',
+		onMutate: (obj) => {
+			console.log(obj);
+		},
 		onSuccess: (data) => {
 			Swal.fire({
 				title: 'Success',
@@ -19,6 +22,11 @@ export default function Requests({ requestArray }) {
 				icon: 'success',
 				confirmButtonText: 'Ok',
 			});
+			if (data.wait) {
+				data.wait().then((res) => {
+					console.log(res);
+				});
+			}
 		},
 		onError: (err) => {
 			Swal.fire({
@@ -84,12 +92,15 @@ export default function Requests({ requestArray }) {
 	const [requests, setRequests] = useState(requestArray);
 
 	const handleRoleAdd = (address, role) => async (e) => {
-		e.preventDefault();
+		if (e) {
+			e.preventDefault();
+		}
 		console.log(address, role);
 		if (role === 'farmer') {
-			await writeAsFarmer({
+			const value = await writeAsFarmer({
 				recklesslySetUnpreparedArgs: [address],
 			});
+			console.log('value', value);
 		} else if (role === 'distributor') {
 			await writeAsDistributor({
 				recklesslySetUnpreparedArgs: [address],

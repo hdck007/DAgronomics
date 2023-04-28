@@ -7,12 +7,12 @@
 const hre = require('hardhat');
 
 async function main() {
-	const Login = await hre.ethers.getContractFactory('SupplyChain');
-	const login = await Login.deploy();
+	const SupplyChain = await hre.ethers.getContractFactory('SupplyChain');
+	const supplyChain = await SupplyChain.deploy();
 
-	await login.deployed();
+	await supplyChain.deployed();
 
-	console.log(`Login deployed to ${login.address}`);
+	console.log(`Login deployed to ${supplyChain.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

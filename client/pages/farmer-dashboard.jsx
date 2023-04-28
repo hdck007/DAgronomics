@@ -13,7 +13,7 @@ function Listing() {
 	const { refetch } = useContractRead({
 		addressOrName: contractaddress,
 		contractInterface: abi,
-		functionName: 'getProducts',
+		functionName: 'getAllProducts',
 	});
 
 	const { write: shipProduct } = useContractWrite({

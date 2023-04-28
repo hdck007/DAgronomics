@@ -14,7 +14,7 @@ function Listing() {
 	const { refetch } = useContractRead({
 		addressOrName: contractaddress,
 		contractInterface: abi,
-		functionName: 'getProducts',
+		functionName: 'getAllProducts',
 	});
 
 	const { write: receiveProduct } = useContractWrite({
@@ -112,7 +112,6 @@ function Listing() {
 	const handleShip = (id) => (e) => {
 		e.preventDefault();
 		shipProduct({ recklesslySetUnpreparedArgs: [id] });
-		setRefetch((refetch) => refetch + 1);
 	};
 
 	const handleSell = (id) => (e) => {
@@ -123,19 +122,16 @@ function Listing() {
 	const handlePack = (id) => (e) => {
 		e.preventDefault();
 		packProduct({ recklesslySetUnpreparedArgs: [id] });
-		setRefetch((refetch) => refetch + 1);
 	};
 
 	const handleReceive = (id) => (e) => {
 		e.preventDefault();
 		receiveProduct({ recklesslySetUnpreparedArgs: [id] });
-		setRefetch((refetch) => refetch + 1);
 	};
 
 	const handleProcess = (id) => (e) => {
 		e.preventDefault();
 		processProduct({ recklesslySetUnpreparedArgs: [id] });
-		setRefetch((refetch) => refetch + 1);
 	};
 
 	useEffect(() => {

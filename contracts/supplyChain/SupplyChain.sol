@@ -61,8 +61,7 @@ contract SupplyChain is
         address originFarmerID; // Metamask-Ethereum address of the Farmer // ADDED PAYABLE
         string originFarmName; // Farmer Name
         string originFarmInformation; // Farmer Information
-        string originFarmLatitude; // Farm Latitude
-        string originFarmLongitude; // Farm Longitude
+        string productImage; // Product Image
         uint256 productID; // Product ID potentially a combination of productCode + stockUnit
         string productNotes; // Product Notes
         uint256 productDate; // Product Date NOTE: MIGHT NEED TO CHANGE type
@@ -75,6 +74,10 @@ contract SupplyChain is
         string name; // Product Name
         string description; // Product Description
         uint256 productIndex; // Product Index
+        uint256 dateFarmerShipped; // Date Farmer Shipped Product
+        uint256 dateDistributorReceived; // Date Distributor Received Product
+        uint256 dateDistributorShipped; // Date Distributor Shipped Product
+        uint256 dateRetailerReceived; // Date Retailer Received Product
     }
 
     // Block number stuct
@@ -210,12 +213,28 @@ contract SupplyChain is
         return payable(address(uint160(x)));
     }
 
-    function getProducts() public view returns (Item[] memory) {
+    // function getAllProducts() public view returns (Item[] memory) {
+    //     Item[] memory products = new Item[](productIndex);
+    //     for (uint256 i = 0; i < productIndex; i++) {
+    //         products[i] = items[i];
+    //     }
+    //     return products;
+    // }
+
+    function getAllProducts() public view returns (Item[] memory) {
         Item[] memory products = new Item[](productIndex);
         for (uint256 i = 0; i < productIndex; i++) {
             products[i] = items[i];
         }
         return products;
+    }
+
+    function getProductByIndex(uint256 _index)
+        public
+        view
+        returns (Item memory)
+    {
+        return items[_index];
     }
 
     function getProductById(uint256 _productCode)
@@ -236,9 +255,8 @@ contract SupplyChain is
         uint256 _quantity,
         string memory _originFarmName,
         string memory _originFarmInformation,
-        string memory _originFarmLatitude,
-        string memory _originFarmLongitude,
         string memory _productNotes,
+        string memory _productImage,
         uint256 _price
     )
         public
@@ -257,13 +275,12 @@ contract SupplyChain is
         newProduce.originFarmerID = _msgSender(); // Metamask-Ethereum address of the Farmer
         newProduce.originFarmName = _originFarmName; // Farmer Name
         newProduce.originFarmInformation = _originFarmInformation; // Farmer Information
-        newProduce.originFarmLatitude = _originFarmLatitude; // Farm Latitude
-        newProduce.originFarmLongitude = _originFarmLongitude; // Farm Longitude
         newProduce.productID = productCode + stockUnit; // Product ID
         newProduce.productNotes = _productNotes; // Product Notes
         newProduce.productPrice = _price; // Product Price
         newProduce.productDate = block.timestamp;
         newProduce.productIndex = productIndex; // Product Index
+        newProduce.productImage = _productImage; // Product Image
         newProduce.productSliced = 0;
         newProduce.itemState = defaultState; // Product State as represented in the enum above
         newProduce.distributorID = distributorID; // Metamask-Ethereum address of the Distributor
@@ -327,6 +344,7 @@ Allows distributor to purchase cheese
         purchasedByDistributor(_productCode)
         verifyCaller(items[_productCode].originFarmerID) // check _msgSender() is originFarmID
     {
+        items[_productCode].dateFarmerShipped = block.timestamp; // update owner
         items[_productCode].itemState = State.ShippedByFarmer; // update state
         emit ShippedByFarmer(_productCode);
     }
@@ -341,6 +359,7 @@ Allows distributor to purchase cheese
         shippedByFarmer(_productCode)
         verifyCaller(items[_productCode].ownerID) // check _msgSender() is owner
     {
+        items[_productCode].dateDistributorReceived = block.timestamp; // log the time
         items[_productCode].itemState = State.ReceivedByDistributor; // update state
         emit ReceivedByDistributor(_productCode);
     }
@@ -416,6 +435,7 @@ Allows distributor to purchase cheese
         purchasedByRetailer(_productCode)
         verifyCaller(items[_productCode].distributorID) // check _msgSender() is distributorID
     {
+        items[_productCode].dateDistributorShipped = block.timestamp;
         items[_productCode].itemState = State.ShippedByDistributor;
         emit ShippedByDistributor(_productCode);
     }
@@ -429,6 +449,7 @@ Allows distributor to purchase cheese
         shippedByDistributor(_productCode)
         verifyCaller(items[_productCode].ownerID) // check _msgSender() is ownerID
     {
+        items[_productCode].dateRetailerReceived = block.timestamp;
         items[_productCode].itemState = State.ReceivedByRetailer;
         emit ReceivedByRetailer(_productCode);
     }
@@ -481,8 +502,6 @@ Allows distributor to purchase cheese
             address originFarmerID,
             string memory originFarmName,
             string memory originFarmInformation,
-            string memory originFarmLatitude,
-            string memory originFarmLongitude,
             uint256 productDate,
             uint256 productSliced
         )
@@ -497,8 +516,6 @@ Allows distributor to purchase cheese
             item.originFarmerID,
             item.originFarmName,
             item.originFarmInformation,
-            item.originFarmLatitude,
-            item.originFarmLongitude,
             item.productDate,
             item.productSliced
         );

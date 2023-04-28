@@ -9,9 +9,15 @@ function ListComponent({ data }) {
 			{data.map((crop) => (
 				<div
 					key={crop.id}
-					className='card shadow-2xl rounded-2xl bg-neutral-focus p-2 py-5 flex-grow my-4 min-w-[300px] max-w-[400px]'
+					className='card hover:border-primary transition-all duration-300 ease-in-out border-neutral-focus border shadow-2xl rounded-2xl bg-neutral-focus p-2 py-5 flex-grow my-4 min-w-[300px] max-w-[400px]'
 				>
-					<Image src={crop.image} alt={crop.name} width={200} height={200} />
+					<img
+						className='w-full'
+						src={crop.image}
+						alt={crop.name}
+						width={200}
+						height={200}
+					/>
 					<h2 className='card-title px-4'>{crop.name}</h2>
 					<div className='flex flex-grow'>
 						<span className='border border-primary py-1 px-4 rounded-full m-2'>

@@ -12,7 +12,7 @@ function Profile() {
 	const router = useRouter();
 
 	useEffect(() => {
-		if (isConnected) {
+		if (isConnected && role) {
 			if (!role) {
 				router.push('/signup');
 			} else {

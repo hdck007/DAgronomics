@@ -1,12 +1,14 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useContractWrite } from 'wagmi';
+import Swal from 'sweetalert2';
 import Layout from '../src/components/layout';
 import InputField from '../src/components/input-component';
 import { abi, contractaddress } from '../src/constants';
 import useAuth from '../src/hooks/useAuth';
-import Swal from 'sweetalert2';
 
 function Create() {
+	const [cid, setCid] = useState('');
 	const {
 		register,
 		handleSubmit,
@@ -27,8 +29,11 @@ function Create() {
 				icon: 'success',
 				confirmButtonText: 'Ok',
 			});
+			reset();
+			setCid('');
 		},
 		onError: (err) => {
+			console.error(err);
 			Swal.fire({
 				title: 'Error',
 				text: 'Product add request failed',
@@ -39,21 +44,32 @@ function Create() {
 	});
 
 	const onSubmit = (data) => {
+		const copyOfData = { ...data };
 		try {
-			write({
-				recklesslySetUnpreparedArgs: [
+			if (cid) {
+				console.log([
 					data.name,
 					data.description,
 					+data.quantity,
 					data.district,
 					data.town,
-					'',
-					'',
 					data.grade,
+					cid,
 					+data.price,
-				],
-			});
-			reset();
+				]);
+				write({
+					recklesslySetUnpreparedArgs: [
+						data.name,
+						data.description,
+						+data.quantity,
+						data.district,
+						data.town,
+						data.grade,
+						cid,
+						+data.price,
+					],
+				});
+			}
 		} catch (err) {
 			console.error('The error');
 		}
@@ -63,6 +79,46 @@ function Create() {
 		<Layout>
 			<div className='mx-auto flex flex-col justify-center items-center prose'>
 				<h2 className='self-start px-4'>Add product</h2>
+				<input
+					disabled={contractLoading}
+					type='file'
+					name='file'
+					onChange={async (e) => {
+						const formData = new FormData();
+						const myFile = new File([e.target.files[0]], 'file');
+						console.log(myFile);
+						formData.append('file', myFile);
+						fetch('https://api.nft.storage/upload', {
+							method: 'POST',
+							body: formData,
+							headers: {
+								Authorization: `Bearer ${process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY}`,
+							},
+						})
+							.then((data) => data.json())
+							.then((data) => {
+								setCid(data.value.cid);
+							})
+							.catch((err) => {
+								console.error(err);
+								Swal.fire({
+									title: 'Error',
+									text: 'Upload failed',
+									icon: 'error',
+									confirmButtonText: 'Ok',
+								});
+							});
+					}}
+				/>
+				{!!cid && (
+					<>
+						<h4>Image preview</h4>
+						<img
+							src={`https://${cid}.ipfs.nftstorage.link/file`}
+							alt='product'
+						/>
+					</>
+				)}
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className='flex flex-col justify-around w-full'
@@ -99,7 +155,7 @@ function Create() {
 					/>
 					<input
 						className='btn btn-primary'
-						disabled={contractLoading}
+						disabled={contractLoading || cid === ''}
 						value='Submit'
 						type='submit'
 					/>

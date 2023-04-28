@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import Swal from 'sweetalert2';
+import Link from 'next/link';
+import { QRCodeCanvas } from 'qrcode.react';
 import Layout from '../../src/components/layout';
 import { abi, contractaddress } from '../../src/constants';
 import useAuth from '../../src/contexts/auth-context';
@@ -14,7 +16,7 @@ function CropDetails({ id, bids }) {
 		args: [id],
 		addressOrName: contractaddress,
 		contractInterface: abi,
-		functionName: 'getProductById',
+		functionName: 'getProductByIndex',
 	});
 
 	const { write: sellProduct } = useContractWrite({
@@ -136,7 +138,16 @@ function CropDetails({ id, bids }) {
 	};
 
 	const handleDistributorBid = async () => {
-		console.log(id);
+		const check = bidsArray.find(
+			(bid) => bid.user === address && bid.productId === Number(id)
+		);
+		if (check) {
+			Swal.fire({
+				icon: 'error',
+				text: 'You have already placed a bid',
+			});
+			return;
+		}
 		await fetch(
 			`/api/createbid?user=${address}&productId=${Number(
 				id
@@ -157,16 +168,6 @@ function CropDetails({ id, bids }) {
 					text: 'Some error occured',
 				});
 			});
-		const check = bidsArray.find(
-			(bid) => bid.user === address && bid.productId === Number(id)
-		);
-		if (check) {
-			Swal.fire({
-				icon: 'error',
-				text: 'You have already placed a bid',
-			});
-			return;
-		}
 		setBidsArray((prev) => [
 			...prev,
 			{
@@ -185,6 +186,17 @@ function CropDetails({ id, bids }) {
 	};
 
 	const handleRetailerBid = async () => {
+		const check = bidsArray.find(
+			(bid) => bid.user === address && bid.productId === Number(id)
+		);
+		console.log(check);
+		if (check) {
+			Swal.fire({
+				icon: 'error',
+				text: 'You have already placed a bid',
+			});
+			return;
+		}
 		await fetch(
 			`/api/createbid?user=${address}&productId=${Number(
 				id
@@ -237,7 +249,7 @@ function CropDetails({ id, bids }) {
 					id: Number(data.data.productIndex._hex),
 					name: data.data.name,
 					description: data.data.description,
-					image: `https://cdn.britannica.com/89/140889-050-EC3F00BF/Ripening-heads-rice-Oryza-sativa.jpg`,
+					image: `https://${data.data.productImage}.ipfs.nftstorage.link/file`,
 					location: data.data.originFarmInformation,
 					price: Number(data.data.productPrice._hex),
 					quantity: Number(data.data.quantity._hex),
@@ -258,7 +270,7 @@ function CropDetails({ id, bids }) {
 		<Layout>
 			{!isFetched || isLoading || isError ? (
 				<div className='flex justify-center items-center h-screen'>
-					<div className='loader ease-linear animate-spin border-8 border-t-8 border-gray-200 h-12 w-12 duration-1000 ease-in-out' />
+					<div className='loader animate-spin border-8 border-t-8 border-gray-200 h-12 w-12 duration-1000 ease-in-out' />
 				</div>
 			) : (
 				<div className='prose prose-h1:text-4xl w-full max-w-6xl mx-auto'>
@@ -296,6 +308,8 @@ function CropDetails({ id, bids }) {
 					</div>
 					<div className='p-4'>
 						<h2>Distributor bids</h2>
+						{bidsArray.filter((item) => item.type === 'distributor').length ===
+							0 && <p>No bids now</p>}
 						{bidsArray
 							.filter((item) => item.type === 'distributor')
 							.map((item) => (
@@ -352,16 +366,18 @@ function CropDetails({ id, bids }) {
 					</div>
 					<div className='p-4'>
 						<h2>Retailer bids</h2>
+						{bidsArray.filter((item) => item.type === 'retailer').length ===
+							0 && <p>No bids now</p>}
 						{bidsArray
 							.filter((item) => item.type === 'retailer')
 							.map((item) => (
 								<div className='flex justify-between px-6 items-center'>
 									<p>
-										<span className=' text-secondary font-semibold '>
+										<span className=' overflow-ellipsis break-words text-secondary font-semibold '>
 											{item.user}
 										</span>{' '}
 										bid for this product for{' '}
-										<span className='text-primary underline font-bold'>
+										<span className=' text-primary underline font-bold'>
 											{item.amount}
 										</span>{' '}
 										per unit
@@ -407,6 +423,24 @@ function CropDetails({ id, bids }) {
 								per unit
 							</p>
 						)}
+						<div className='flex justify-between pb-10'>
+							{cropDetail.state > 7 && (
+								<Link href={`/verify/${id}`}>
+									<a className='btn btn-primary m-6 px-10'>
+										Check timeline here
+									</a>
+								</Link>
+							)}
+							{cropDetail.state > 7 && (
+								<QRCodeCanvas
+									id='qrCode'
+									value={`http://localhost:3000/verify/${id}`}
+									size={150}
+									bgColor='#00ff00'
+									level='H'
+								/>
+							)}
+						</div>
 					</div>
 				</div>
 			)}
